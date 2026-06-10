@@ -9,5 +9,5 @@ The scripts provided in the "code" directory use, and produce, the data files pr
 
 Example usage of a script:
 ```
-python3 use_comet.py
+python3 use_comet_ground.py
 ```
