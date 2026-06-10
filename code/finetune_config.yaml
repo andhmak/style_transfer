@@ -1,0 +1,43 @@
+# finetune_config_head.yaml: training StyleCOMET
+
+regression_metric:
+  class_path: comet.models.RegressionMetric
+  init_args:
+    encoder_model: XLM-RoBERTa
+    pretrained_model: xlm-roberta-large
+    learning_rate: 5.0e-6
+    encoder_learning_rate: 2.0e-6
+    layerwise_decay: 0.95
+    pool: avg
+    dropout: 0.1
+    batch_size: 16
+    train_data: ["train.csv"]
+    validation_data: ["val.csv"]
+    hidden_sizes: [3072, 1024]
+
+trainer:
+  class_path: pytorch_lightning.Trainer
+  init_args:
+    accelerator: gpu
+    devices: 8
+    strategy: ddp
+    precision: bf16-mixed
+    max_epochs: 2
+    log_every_n_steps: 5
+    enable_checkpointing: true
+
+early_stopping:
+  class_path: pytorch_lightning.callbacks.EarlyStopping
+  init_args:
+    monitor: val_pearson
+    patience: 2
+    mode: max
+
+model_checkpoint:
+  class_path: pytorch_lightning.callbacks.ModelCheckpoint
+  init_args:
+    dirpath: custom_comet_checkpoints/
+    filename: "{epoch}-{val_pearson:.4f}"
+    monitor: val_pearson
+    mode: max
+    save_top_k: 1
